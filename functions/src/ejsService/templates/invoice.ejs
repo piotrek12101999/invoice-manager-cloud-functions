@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<% const formatter = new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN', }); %>
+<html lang="pl">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Invoice <%= number %></title>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,500,600&display=swap%22.css" />
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                font-family: 'Roboto';
+            }
+            * {
+                box-sizing: border-box;
+                -moz-box-sizing: border-box;
+            }
+            .page {
+                padding: 17px;
+            }
+
+            .date-section {
+                width: 175px;
+                margin-right: 0;
+                margin-left: auto;
+                text-align: center;
+                padding-top: 15px;
+            }
+
+            .date-section > .title {
+                border-top: solid black 1px;
+                background-color: #e2e2e2;
+                padding-top: 1px;
+                padding-bottom: 1px;
+                font-size: 11px;
+            }
+
+            .date-section > .date {
+                padding-top: 2px;
+                padding-bottom: 2px;
+                font-weight: 600;
+                font-size: 12px;
+            }
+
+            .people-section {
+                display: -webkit-box;
+                display: -webkit-flex;
+                display: flex;
+                margin-top: 20px;
+            }
+
+            .people-section > .person {
+                width: 250px;
+                font-size: 10px;
+                margin-top: 10px;
+            }
+
+            .people-section > .buyer {
+                width: 25ppx;
+                margin-right: 0;
+                margin-left: auto;
+            }
+
+            .people-section > .person > .title {
+                border-top: solid black 1px;
+                background-color: #e2e2e2;
+                text-align: center;
+                font-weight: 600;
+                font-size: 11px;
+            }
+
+            .people-section > .person > .data > div {
+                margin-top: 2px;
+            }
+
+            .invoice-title {
+                margin-top: 25px;
+                text-align: center;
+                font-weight: 600;
+                font-size: 22px;
+            }
+
+            table {
+                margin-top: 5px;
+                border-collapse: collapse;
+                width: 100%;
+            }
+
+            table > tbody > tr > th {
+                border: solid black 1px;
+                background-color: #e2e2e2;
+                font-size: 8px;
+                padding: 2px;
+            }
+
+            table > tbody > tr > td {
+                text-align: center;
+                border: solid black 1px;
+                font-size: 10px;
+                padding: 2.5px;
+            }
+
+            table > tbody > tr > .no-border {
+                border: none;
+            }
+
+            .details {
+                margin-top: 50px;
+                display: -webkit-box;
+                display: -webkit-flex;
+                display: flex;
+            }
+
+            .details > .detail {
+                max-width: 300px;
+            }
+
+            .details > .detail > div {
+                border-top: 1px solid #000;
+                padding-top: 1px;
+                padding-bottom: 1px;
+                font-size: 11px;
+            }
+
+            .details > .detail > div > span {
+                margin-left: 5px;
+            }
+
+            .details > .detail > .price {
+                font-weight: 600;
+            }
+
+            .details > .right {
+                min-width: 200px;
+                margin-right: 0;
+                margin-left: auto;
+            }
+
+            .signatures {
+                margin-top: 100px;
+                display: -webkit-box;
+                display: -webkit-flex;
+                display: flex;
+            }
+
+            .signatures > .signature {
+                width: 200px;
+                text-align: center;
+                border-top: solid black 1px;
+                padding-top: 3px;
+                font-size: 7px;
+            }
+
+            .signatures > .right {
+                margin-right: 0;
+                margin-left: auto;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="page">
+            <div class="date-section">
+                <div class="title">Data wystawienia</div>
+                <div class="date"><%= issueDate %></div>
+            </div>
+            <div class="date-section">
+                <div class="title">Data sprzedaży</div>
+                <div class="date"><%= saleDate %></div>
+            </div>
+            <div class="people-section">
+                <div class="person">
+                    <div class="title">Sprzedawca</div>
+                    <div class="data">
+                        <div><%= user.name %></div>
+                        <div>NIP: <%= user.NIP %></div>
+                        <div><%= user.street %></div>
+                        <div><%= user.postalCode %> <%= user.city %></div>
+                    </div>
+                </div>
+                <div class="person buyer">
+                    <div class="title">Nabywca</div>
+                    <div class="data">
+                        <div><%= customer.name %></div>
+                        <div>NIP: <%= customer.NIP %></div>
+                        <div><%= customer.street %></div>
+                        <div><%= customer.postalCode %> <%= customer.city %></div>
+                    </div>
+                </div>
+            </div>
+            <div class="invoice-title">Faktura VAT <%= number %></div>
+            <table>
+                <tbody>
+                    <tr>
+                        <th>Lp.</th>
+                        <th>Nazwa towaru lub usługi</th>
+                        <th>Jm.</th>
+                        <th>Ilość</th>
+                        <th>Cena netto</th>
+                        <th>Wartość netto</th>
+                        <th>Stawka VAT</th>
+                        <th>Kwota VAT</th>
+                        <th>Wartośc brutto</th>
+                    </tr>
+                    <% products.forEach(({ name, quantity, netPrice, VATRate, grossAmount}, index) => { %>
+                    <tr>
+                        <td><%= index + 1 %></td>
+                        <td><%= name %></td>
+                        <td>szt.</td>
+                        <td><%= quantity %></td>
+                        <td><%= formatter.format(netPrice) %></td>
+                        <td><%= formatter.format(quantity * netPrice) %></td>
+                        <td><%= VATRate %>%</td>
+                        <td><%= formatter.format(grossAmount - quantity * netPrice) %></td>
+                        <td><%= formatter.format(grossAmount) %></td>
+                    </tr>
+                    <% }); %> <% Object.keys(taxes).forEach((key, index) => { %>
+                    <tr>
+                        <td class="no-border"></td>
+                        <td class="no-border"></td>
+                        <td class="no-border"></td>
+                        <td class="no-border"></td>
+                        <td class="no-border">
+                            <% if (index === 0) { %>
+                            <strong>W tym</strong>
+                            <% } %>
+                        </td>
+                        <td><%= formatter.format(taxes[key].netPrice) %></td>
+                        <td><%= key %>%</td>
+                        <td><%= formatter.format(taxes[key].grossAmount - taxes[key].netPrice) %></td>
+                        <td><%= formatter.format(taxes[key].grossAmount) %></td>
+                    </tr>
+                    <% }); %>
+                    <tr>
+                        <td class="no-border"></td>
+                        <td class="no-border"></td>
+                        <td class="no-border"></td>
+                        <td class="no-border"></td>
+                        <td class="no-border"><strong> Razem </strong></td>
+                        <td><%= formatter.format(taxesSummary.netPrice) %></td>
+                        <td></td>
+                        <td><%= formatter.format(taxesSummary.grossAmount - taxesSummary.netPrice) %></td>
+                        <td><%= formatter.format(taxesSummary.grossAmount) %></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="details">
+                <div class="detail">
+                    <% if (details.partlyPaid) { %>
+                    <div>
+                        <strong> Zapłacono: <span> <%= formatter.format(details.partlyPaid) %> </span> </strong>
+                    </div>
+                    <% } %>
+                    <div>Sposób płatności <span> przelew </span></div>
+                    <div>Numer konta <span> <%= user.account %> </span></div>
+                    <% if (details.status) { %>
+                    <div>Status: <span> <%= details.status %> </span></div>
+                    <% } %> <% if (details.paymentDeadline) { %>
+                    <div>Termin płatności: <span> <%= details.paymentDeadline %> </span></div>
+                    <% } %> <% if (details.comments) { %>
+                    <div>Uwagi: <span> <%= details.comments %> </span></div>
+                    <% } %>
+                </div>
+                <div class="detail right">
+                    <div class="price">
+                        Do zapłaty <% if (details.partlyPaid) { %>
+                        <span> <%= formatter.format(totalPrice - details.partlyPaid)%> </span>
+                        <% } else { %>
+                        <span> <%= formatter.format(totalPrice) %></span>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+            <div class="signatures">
+                <div class="signature">Podpis osoby upoważnionej do wystawienia</div>
+                <div class="signature right">Podpis osoby upoważnionej do odbioru</div>
+            </div>
+        </div>
+    </body>
+</html>

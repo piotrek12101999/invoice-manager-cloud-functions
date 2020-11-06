@@ -1,6 +1,9 @@
 import * as functions from 'firebase-functions';
-import { handler } from './invoicesModule/invoicesModule';
+import admin from 'firebase-admin';
+import { handler } from './invoiceService/invoiceService';
 
 const REGION = 'europe-west1';
 
-export const onInvoiceAdded = functions.region(REGION).firestore.document('{company}/invoices/invoices/{invoice}').onCreate(handler)
+admin.initializeApp();
+
+export const onInvoiceAdded = functions.region(REGION).firestore.document('{company}/invoices/invoices/{invoice}').onCreate(handler);
