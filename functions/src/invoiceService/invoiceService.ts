@@ -20,7 +20,6 @@ export const handler = async (
 
   try {
     const user = await admin.firestore().doc(`${company}/data`).get();
-    const settings = await admin.firestore().doc(`${company}/settings`).get();
     const taxes = calculateVATRateInfo(data.products);
     const taxesSummary = calculateSummary(taxes);
 
@@ -48,15 +47,27 @@ export const handler = async (
     );
     await transporter.sendMail({
       from: functions.config().mail_service.user,
-      to: settings.data()?.mailingList,
+      to: data.customer.mailingList,
       subject,
       text,
       attachments: [
-        { filename: `Faktura VAT ${data.number}`, content: pdfBuffer },
+        { filename: `Faktura_VAT_${data.number}.pdf`, content: pdfBuffer },
       ],
     });
 
     return snapshot.ref.update({ isGeneratedPDF: true });
+  } catch (err) {
+    throw new Error(err);
+  }
+};
+
+export const deleteHandler = async (
+  snapshot: functions.firestore.QueryDocumentSnapshot,
+  context: functions.EventContext
+) => {
+  try {
+    const bucket = admin.storage().bucket();
+    return await bucket.file(`${context.params.company}/invoices/${snapshot.id}`).delete();
   } catch (err) {
     throw new Error(err);
   }
